@@ -12,12 +12,16 @@ class AlbumController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
+        $kategoriId = $request->input('kategori');
 
         // Query albums berdasarkan nama atau deskripsi, termasuk cover image dan kategori
         $albums = Album::with(['coverImage', 'kategori'])
-            ->when($search, function ($query, $search) {
+            ->when($search, function ($query) use ($search) {
                 $query->where('Nama', 'like', "%{$search}%")
                       ->orWhere('Deskripsi', 'like', "%{$search}%");
+            })
+            ->when($kategoriId, function ($query) use ($kategoriId) {
+                return $query->where('KategoriID', $kategoriId);
             })
             ->get();
 

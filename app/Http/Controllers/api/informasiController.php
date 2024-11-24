@@ -36,13 +36,18 @@ class informasiController extends Controller
 public function index(Request $request)
 {
     $search = $request->input('search');
+    $kategoriId = $request->input('kategori');
 
-    // Ambil semua informasi dengan pencarian dan sertakan kategori
+    // Ambil semua informasi dengan pencarian, filter kategori dan sertakan kategori
     $informasi = Informasi::with('kategori') // Mengambil data kategori
         ->when($search, function ($query) use ($search) {
             return $query->where('judul', 'like', '%' . $search . '%')
                          ->orWhere('isi', 'like', '%' . $search . '%');
-        })->get(); // Mengambil semua data tanpa batasan
+        })
+        ->when($kategoriId, function ($query) use ($kategoriId) {
+            return $query->where('KategoriID', $kategoriId);
+        })
+        ->get(); // Mengambil semua data tanpa batasan
 
     // Ubah path file menjadi URL publik dengan asset()
     $informasi->transform(function ($info) {

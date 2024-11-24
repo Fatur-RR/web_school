@@ -16,7 +16,9 @@
         </style>
 
 
-        <title>SMKN 4 BOGOR</title>
+        <title>{{ $config['apk_name'] }}</title>
+        <link rel="icon" href="{{ asset('storage/'.$config['logo'])}}">
+
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">

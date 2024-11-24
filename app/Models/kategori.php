@@ -13,8 +13,7 @@ class Kategori extends Model
     protected $primaryKey = 'KategoriID';
 
     protected $fillable = [
-        'NamaKategori',
-        'Keterangan'
+        'judul',
     ];
 
     // Relasi ke model Agenda

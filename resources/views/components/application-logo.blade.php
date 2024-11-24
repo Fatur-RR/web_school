@@ -1,2 +1,1 @@
-<img src="{{ asset('images/LOGO SMKN 4.png') }}" alt="Agenda" class="{{ $attributes }}" />
-
+<img src="{{ asset('storage/'.$config['logo'])}}" alt="Agenda" class="w-48 h-48 object-contain" />

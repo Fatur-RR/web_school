@@ -9,6 +9,22 @@
                 .content-auto {
                     content-visibility: auto;
                 }
+
+                /* Animasi untuk menu mobile */
+                .animate-fade-in {
+                    animation: fadeIn 0.3s ease-in-out;
+                }
+
+                @keyframes fadeIn {
+                    from {
+                        opacity: 0;
+                        transform: translateY(-10px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
             }
 
             /* Atur lebar dan tinggi card */
@@ -16,7 +32,9 @@
         </style>
 
 
-        <title>SMKN 4 BOGOR</title>
+        <title>{{ $config['apk_name'] }}</title>
+        <link rel="icon" href="{{ asset('storage/'.$config['logo'])}}">
+
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -55,8 +73,8 @@
                 <div class="flex justify-center items-center flex-1">
                     <a href="{{ route('welcome') }}" class="-m-1.5 p-1.5 flex items-center">
                         <span class="sr-only">Your Company</span>
-                        <img class="h-8 w-auto" src="{{ asset('images/LOGO SMKN 4.png') }}" alt="Logo">
-                        <span class="ml-3 text-lg font-bold">SMKN 4 BOGOR</span>
+                        <img class="h-8 w-auto" src="{{ asset('storage/'.$config['logo'])}}" alt="Logo">
+                        <span class="ml-3 text-lg font-bold">{{ $config['apk_name'] }}</span>
                     </a>
                 </div>
 
@@ -72,9 +90,6 @@
                             <a href="{{ url('/dashboard') }}" class="text-sm font-semibold leading-6 text-gray-900">Dashboard<span aria-hidden="true">&rarr;</span></a>
                         @else
                             <a href="{{ route('login') }}" class="text-sm font-semibold leading-6 text-gray-900">Log in<span aria-hidden="true">&rarr;</span></a>
-                            @if (Route::has('register'))
-                                <a href="{{ route('register') }}" class="text-sm font-semibold leading-6 text-gray-900">Register<span aria-hidden="true">&rarr;</span></a>
-                            @endif
                         @endauth
                     @endif
                 </div>
@@ -98,9 +113,6 @@
                             <a href="{{ url('/dashboard') }}" class="block text-base font-semibold text-gray-900">Dashboard</a>
                         @else
                             <a href="{{ route('login') }}" class="block text-base font-semibold text-gray-900">Log in</a>
-                            @if (Route::has('register'))
-                                <a href="{{ route('register') }}" class="block text-base font-semibold text-gray-900">Register</a>
-                            @endif
                         @endauth
                     @endif
                 </div>
@@ -113,9 +125,25 @@
             </div>
             <div class="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56 text-center">
                 <h1 class="text-4xl font-serif tracking-tight text-gray-900 sm:text-6xl">Album Foto</h1>
-                <p class="mt-6 text-lg leading-8 text-gray-600">Album SMKN 4 Bogor</p>
-                <form class="mt-8" method="GET" action="{{ route('album') }}">
-                    <input class="w-full px-6 py-4 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 hover:border-indigo-500 transition-all duration-300" type="text" name="search" value="{{ request('search') }}" placeholder="Cari album...">
+                <p class="mt-6 text-lg leading-8 text-gray-600">{{ $config['album_teks'] }}</p>
+                <form class="mt-8 space-y-4" method="GET" action="{{ route('album') }}" id="filterForm">
+                    <input class="w-full px-6 py-4 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 hover:border-indigo-500 transition-all duration-300" 
+                           type="text" 
+                           name="search" 
+                           value="{{ request('search') }}" 
+                           placeholder="Cari album..."
+                           oninput="this.form.submit()">
+                    
+                    <select name="kategori" 
+                            class="w-full px-6 py-4 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 hover:border-indigo-500 transition-all duration-300"
+                            onchange="this.form.submit()">
+                        <option value="">Semua Kategori</option>
+                        @foreach($kategoris as $kategori)
+                            <option value="{{ $kategori->KategoriID }}" {{ $selectedKategori == $kategori->KategoriID ? 'selected' : '' }}>
+                                {{ $kategori->judul }}
+                            </option>
+                        @endforeach
+                    </select>
                 </form>
             </div>
     </div>
@@ -143,9 +171,31 @@
         </div>
     </div>
 
+    <!-- Tambahkan script di bagian bawah body -->
+    <script>
+        // Ambil elemen yang diperlukan
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
 
+        // Tambahkan event listener untuk button
+        mobileMenuButton.addEventListener('click', () => {
+            // Toggle class hidden pada menu mobile
+            mobileMenu.classList.toggle('hidden');
 
+            // Optional: Animate the menu
+            if (!mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.add('animate-fade-in');
+            } else {
+                mobileMenu.classList.remove('animate-fade-in');
+            }
+        });
 
-
+        // Optional: Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!mobileMenuButton.contains(e.target) && !mobileMenu.contains(e.target)) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+    </script>
 </body>
 </html>

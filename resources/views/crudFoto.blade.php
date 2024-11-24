@@ -5,7 +5,7 @@
 
         <div class="mt-4 mb-4">
             <form class="mt-8" method="GET" action="{{ route('foto.index') }}">
-                <input class="w-full px-6 py-4 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 hover:border-indigo-500 transition-all duration-300" type="text" name="search" value="{{ request('search') }}" placeholder="Cari album...">
+                <input class="w-full px-6 py-4 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 hover:border-indigo-500 transition-all duration-300" type="text" name="search" value="{{ request('search') }}" placeholder="Cari foto...">
             </form>
         </div>
 
@@ -148,14 +148,14 @@
 
     // Mengelola modal edit
     function openEditModal(foto) {
-    document.getElementById('editPhotoForm').action = `/foto/${foto.FotoID}`; // Sesuaikan dengan URL rute edit
+    document.getElementById('editPhotoForm').action = '{{ route("foto.update", "") }}' + '/' + foto.FotoID;
     document.getElementById('edit_judul').value = foto.judul;
     document.getElementById('edit_deskripsi').value = foto.deskripsi;
     document.getElementById('edit_AlbumID').value = foto.AlbumID;
 
     // Menampilkan file saat ini
     const currentPhotoElement = document.getElementById('currentPhoto');
-    currentPhotoElement.src = foto.file ? `/storage/${foto.file}` : ''; // Sesuaikan path jika diperlukan
+    currentPhotoElement.src = foto.file ? `{{ asset('storage/') }}/${foto.file}` : ''; // Sesuaikan path jika diperlukan
 
     // Menampilkan nama file saat ini
     const currentFileElement = document.getElementById('currentFile');

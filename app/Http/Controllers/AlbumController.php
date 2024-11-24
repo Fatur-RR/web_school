@@ -14,16 +14,28 @@ class AlbumController extends Controller
     public function tampil(Request $request)
     {
         $search = $request->input('search');
+        $kategoriId = $request->input('kategori');
 
-        // Query albums berdasarkan nama atau deskripsi
+        // Ambil semua kategori untuk filter dropdown
+        $kategoris = Kategori::all();
+
+        // Query albums berdasarkan nama, deskripsi dan kategori
         $albums = Album::with('coverImage')
             ->when($search, function ($query, $search) {
                 $query->where('Nama', 'like', "%{$search}%")
                       ->orWhere('Deskripsi', 'like', "%{$search}%");
             })
+            ->when($kategoriId, function($query) use ($kategoriId) {
+                $query->where('KategoriID', $kategoriId);
+            })
             ->get();
 
-        return view('album', compact('albums', 'search'));
+        return view('album', [
+            'albums' => $albums,
+            'search' => $search,
+            'kategoris' => $kategoris,
+            'selectedKategori' => $kategoriId
+        ]);
     }
 
 

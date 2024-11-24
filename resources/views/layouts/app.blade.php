@@ -4,8 +4,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <!-- Add Content Security Policy meta tag -->
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ $config['apk_name'] }}</title>
+
+    <!-- Favicon - Update to use HTTPS -->
+    <link rel="icon" href="{{ asset('storage/'.$config['logo'])}}">
+  
+
     <style type="text/tailwindcss">
         @layer utilities {
             .content-auto {
@@ -13,8 +21,16 @@
             }
         }
 
-        /* Atur lebar dan tinggi card */
+        @media (max-width: 768px) {
+            .sidebar-mobile {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease-in-out;
+            }
 
+            .sidebar-mobile.active {
+                transform: translateX(0);
+            }
+        }
     </style>
 
     <!-- Fonts -->
@@ -28,17 +44,14 @@
 </head>
 <body class="font-sans antialiased">
     <div class="min-h-screen bg-gray-100">
-
-
         <div class="flex">
-              <!-- Pastikan Anda hanya menyertakan navigasi satu kali -->
-             @include('layouts.navigation')
+            <!-- Pastikan Anda hanya menyertakan navigasi satu kali -->
+            @include('layouts.navigation')
 
             <!-- Main Content -->
             <main class="flex-1 py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto min-h-screen">
                 {{ $slot }}
             </main>
-
         </div>
     </div>
 </body>

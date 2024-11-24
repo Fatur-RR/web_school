@@ -10,10 +10,13 @@ class KategoriController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $kategori = kategori::all();
-        return view('crudKategori', compact('kategori'));
+        $search = $request->input('search');
+        $kategori = kategori::when($search, function ($query) use ($search) {
+            return $query->where('judul', 'like', '%' . $search . '%');
+        })->paginate(10);
+        return view('crudKategori', compact('kategori', 'search'));
     }
 
     /**
@@ -67,17 +70,20 @@ class KategoriController extends Controller
     public function update(Request $request, Kategori $kategori)
     {
         // Validasi input
-        $request->validate([
+        $validatedData = $request->validate([
             'judul' => 'required|string|max:255',
         ]);
 
-        // Update kategori
-        $kategori->update([
-            'judul' => $request->judul,
-            'updated_at' => now(),
-        ]);
+        try {
+            // Update kategori
+            $kategori->update([
+                'judul' => $validatedData['judul']
+            ]);
 
-        return redirect()->route('kategori.index')->with('success', 'Kategori berhasil diperbarui');
+            return redirect()->route('kategori.index')->with('success', 'Kategori berhasil diperbarui');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal memperbarui kategori: ' . $e->getMessage());
+        }
     }
 
     /**

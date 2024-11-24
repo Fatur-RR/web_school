@@ -13,28 +13,51 @@ class AgendaController extends Controller
      */
     public function tampil(Request $request)
     {
-        // Ambil parameter pencarian jika ada
+        // Ambil parameter pencarian dan kategori jika ada
         $search = $request->input('search');
+        $kategoriId = $request->input('kategori');
 
-        // Ambil semua agenda dengan paginasi dan pencarian
-        $agendas = agenda::when($search, function ($query) use ($search) {
-            return $query->where('judul', 'like', "%{$search}%") // Pencarian berdasarkan judul
-                         ->orWhere('isi', 'like', "%{$search}%"); // Pencarian berdasarkan isi
-        })->paginate(10); // Ganti angka 10 dengan jumlah data per halaman yang diinginkan
+        // Ambil semua kategori untuk filter dropdown
+        $kategoris = Kategori::all();
+
+        // Query dasar
+        $query = agenda::query();
+
+        // Filter berdasarkan pencarian jika ada
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('judul', 'like', '%' . $search . '%')
+                  ->orWhere('isi', 'like', '%' . $search . '%');
+            });
+        }
+
+        // Filter berdasarkan kategori jika dipilih
+        if ($kategoriId) {
+            $query->where('KategoriID', $kategoriId);
+        }
+
+        // Eksekusi query dengan paginasi
+        $agendas = $query->paginate(10);
 
         // Kirim data ke view agenda
         return view('agenda', [
             'agendas' => $agendas,
-            'search' => $search, // Kirimkan parameter pencarian ke view
+            'search' => $search,
+            'kategoris' => $kategoris,
+            'selectedKategori' => $kategoriId
         ]);
     }
 
 
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->input('search');
         $kategoris = Kategori::all(); // Ambil semua kategori
-        $agendas = Agenda::with(['kategori', 'user'])->get(); // Mengambil semua agenda beserta kategori dan user
-        return view('crudAgenda', compact('agendas', 'kategoris'));
+        $agendas = Agenda::when($search, function ($query) use ($search) {
+            return $query->where('judul', 'like', '%' . $search . '%')
+                         ->orWhere('isi', 'like', '%' . $search . '%');
+        })->with(['kategori', 'user'])->paginate(10); // Mengambil semua agenda beserta kategori dan user
+        return view('crudAgenda', compact('agendas', 'kategoris', 'search'));
     }
 
     /**

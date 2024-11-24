@@ -10,11 +10,13 @@ class Informasi extends Model
     use HasFactory;
 
     protected $table = 'informasis';
-    protected $primaryKey = 'InformasiID';
+
 
     protected $fillable = [
         'KategoriID',
         'judul',
+        'ringkasan',
+        'file',
         'isi',
         'status',
         'user_id',

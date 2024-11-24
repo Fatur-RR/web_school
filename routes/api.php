@@ -6,10 +6,11 @@ use App\Http\Controllers\api\fotoController;
 use App\Http\Controllers\api\AlbumController;
 use App\Http\Controllers\api\informasiController;
 use App\Http\Controllers\api\AgendaController;
-use App\Http\Controllers\API\KategoriController;
-use App\Http\Controllers\API\ProfileController;
-use App\Http\Controllers\API\AuthController;
-use App\Http\Controllers\API\HomeController;
+use App\Http\Controllers\api\KategoriController;
+use App\Http\Controllers\api\ProfileController;
+use App\Http\Controllers\api\AuthController;
+use App\Http\Controllers\api\HomeController;
+use App\Http\Middleware\TrackVisitor;
 
 Route::get('/user', function (Request $request) {
     return $request->user();

@@ -33,14 +33,18 @@ class AgendaController extends Controller
     public function index(Request $request)
 {
     $search = $request->input('search');
+    $kategoriId = $request->input('kategori');
 
-    // Ambil semua agenda dengan pencarian tanpa batasan jumlah hasil
+    // Ambil semua agenda dengan pencarian dan filter kategori
     $agendas = Agenda::with(['kategori', 'user'])
         ->when($search, function ($query) use ($search) {
             return $query->where('judul', 'like', "%{$search}%")
                          ->orWhere('isi', 'like', "%{$search}%");
         })
-        ->get(); // Mengambil semua data tanpa batasan
+        ->when($kategoriId, function ($query) use ($kategoriId) {
+            return $query->where('KategoriID', $kategoriId);
+        })
+        ->get();
 
     return response()->json($agendas);
 }

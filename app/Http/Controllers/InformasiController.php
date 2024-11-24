@@ -11,26 +11,52 @@ use Illuminate\Support\Facades\Auth;
 class InformasiController extends Controller
 {
     public function tampil(Request $request)
-{
-    // Mencari query string dari request
-    $search = $request->input('search');
-
-    // Mengambil informasi, bisa ditambahkan paginasi dan pencarian
-    $informasi = informasi::when($search, function ($query) use ($search) {
-        return $query->where('judul', 'like', '%' . $search . '%')
-                     ->orWhere('isi', 'like', '%' . $search . '%');
-    })->paginate(10); // Menggunakan paginasi dengan 10 item per halaman
-
-    // Mengembalikan ke view dengan informasi yang sudah diproses
-    return view('informasi', ['informasis' => $informasi, 'search' => $search]);
-}
-
-
-    public function index()
     {
-        $informasi = informasi::all();
+        // Mencari query string dari request
+        $search = $request->input('search');
+        $kategoriId = $request->input('kategori');
+
+        // Mengambil semua kategori untuk filter dropdown
+        $kategoris = kategori::all();
+
+        // Query dasar
+        $query = informasi::query();
+
+        // Filter berdasarkan pencarian jika ada
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('judul', 'like', '%' . $search . '%')
+                  ->orWhere('isi', 'like', '%' . $search . '%');
+            });
+        }
+
+        // Filter berdasarkan kategori jika dipilih
+        if ($kategoriId) {
+            $query->where('KategoriID', $kategoriId);
+        }
+
+        // Eksekusi query dengan paginasi
+        $informasi = $query->paginate(10);
+
+        // Mengembalikan ke view dengan informasi yang sudah diproses
+        return view('informasi', [
+            'informasis' => $informasi, 
+            'search' => $search,
+            'kategoris' => $kategoris,
+            'selectedKategori' => $kategoriId
+        ]);
+    }
+
+
+    public function index(Request $request)
+    {
+        $search = $request->input('search');
+        $informasi = informasi::when($search, function ($query) use ($search) {
+            return $query->where('judul', 'like', '%' . $search . '%')
+                         ->orWhere('isi', 'like', '%' . $search . '%');
+        })->paginate(10);
         $kategori = kategori::all();
-        return view('crudInformasi', compact('informasi', 'kategori'));
+        return view('crudInformasi', compact('informasi', 'kategori', 'search'));
     }
 
     public function create()

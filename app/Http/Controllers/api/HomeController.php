@@ -9,7 +9,9 @@ use App\Models\Foto;
 use App\Models\Informasi;
 use App\Models\Kategori;
 use App\Models\User;
+use App\Models\Visitor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
@@ -47,6 +49,21 @@ class HomeController extends Controller
                     'total_albums' => Album::count(),
                     'total_fotos' => Foto::count(),
                     'total_kategoris' => Kategori::count(),
+                    'total_visitors' => Visitor::count(),
+                    'unique_visitors' => Visitor::distinct('ip_address')->count(),
+                ],
+
+                'visitor_stats' => [
+                    'popular_pages' => Visitor::select('page_visited', DB::raw('count(*) as total'))
+                        ->groupBy('page_visited')
+                        ->orderByDesc('total')
+                        ->limit(5)
+                        ->get(),
+                    'daily_visitors' => Visitor::select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as total'))
+                        ->groupBy('date')
+                        ->orderBy('date', 'desc')
+                        ->limit(7)
+                        ->get()
                 ]
             ];
 
@@ -72,6 +89,20 @@ class HomeController extends Controller
                 'albums' => Album::with(['kategori'])->get(),
                 'fotos' => Foto::with(['album'])->get(),
                 'kategoris' => Kategori::withCount(['agendas', 'informasis'])->get(),
+                'visitor_stats' => [
+                    'total_visitors' => Visitor::count(),
+                    'unique_visitors' => Visitor::distinct('ip_address')->count(),
+                    'popular_pages' => Visitor::select('page_visited', DB::raw('count(*) as total'))
+                        ->groupBy('page_visited')
+                        ->orderByDesc('total')
+                        ->limit(5)
+                        ->get(),
+                    'daily_visitors' => Visitor::select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as total'))
+                        ->groupBy('date')
+                        ->orderBy('date', 'desc')
+                        ->limit(7)
+                        ->get()
+                ]
             ];
 
             return response()->json([

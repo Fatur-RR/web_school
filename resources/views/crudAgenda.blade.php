@@ -15,42 +15,51 @@
             </button>
         </div>
 
-        <!-- Tabel agenda -->
-        <div class="bg-white shadow-md rounded my-6">
-            <table class="min-w-full bg-white">
-                <thead>
-                    <tr>
-                        <th class="py-2 px-6 bg-gray-200 text-left text-xs font-bold uppercase text-gray-600">No</th>
-                        <th class="py-2 px-6 bg-gray-200 text-left text-xs font-bold uppercase text-gray-600">Judul</th>
-                        <th class="py-2 px-6 bg-gray-200 text-left text-xs font-bold uppercase text-gray-600">Isi</th>
-                        <th class="py-2 px-6 bg-gray-200 text-left text-xs font-bold uppercase text-gray-600">Kategori</th>
-                        <th class="py-2 px-6 bg-gray-200 text-left text-xs font-bold uppercase text-gray-600">Status</th>
-                        <th class="py-2 px-6 bg-gray-200 text-left text-xs font-bold uppercase text-gray-600">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($agendas as $key => $agenda)
-                        <tr>
-                            <td class="py-2 px-6 border-b border-gray-200">{{ $key + 1 }}</td>
-                            <td class="py-2 px-6 border-b border-gray-200">{{ $agenda->judul }}</td>
-                            <td class="py-2 px-6 border-b border-gray-200">{{ $agenda->isi }}</td>
-                            <td class="py-2 px-6 border-b border-gray-200">{{ $agenda->kategori->judul ?? 'Tidak ada Kategori' }}</td>
-                            <td class="py-2 px-6 border-b border-gray-200"> <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $agenda->status == 'Aktif' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                {{ ucfirst($agenda->status) }}
-                            </span></td>
+        <div class="mt-4 mb-4">
+            <form class="mt-8" method="GET" action="{{ route('agenda.index') }}">
+                <input class="w-full px-6 py-4 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 hover:border-indigo-500 transition-all duration-300" type="text" name="search" value="{{ request('search') }}" placeholder="Cari agenda...">
+            </form>
+        </div>
 
-                            <td class="py-2 px-6 border-b border-gray-200">
-                                <a href="#" onclick="openEditModal({{ json_encode($agenda) }})" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-3 rounded">Edit</a>
-                                <form action="{{ route('agenda.destroy', $agenda->id) }}" method="POST" class="inline-block">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded" onclick="return confirm('Apakah Anda yakin ingin menghapus agenda ini?')">Hapus</button>
-                                </form>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+        <!-- Tabel agenda -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach ($agendas as $key => $agenda)
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-sm text-gray-500">#{{ $key + 1 }}</span>
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $agenda->status == 'Aktif' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                {{ ucfirst($agenda->status) }}
+                            </span>
+                        </div>
+
+                        <h3 class="text-xl font-semibold mb-2">{{ $agenda->judul }}</h3>
+
+                        <div class="mb-4">
+                            <p class="text-gray-600 mb-2">{{ $agenda->isi }}</p>
+                            <p class="text-sm text-gray-500">
+                                Kategori: {{ $agenda->kategori->judul ?? 'Tidak ada Kategori' }}
+                            </p>
+                        </div>
+
+                        <div class="flex space-x-2">
+                            <a href="#" onclick="openEditModal({{ json_encode($agenda) }})"
+                               class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
+                                Edit
+                            </a>
+                            <form action="{{ route('agenda.destroy', $agenda->id) }}" method="POST" class="inline-block">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                        class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                                        onclick="return confirm('Apakah Anda yakin ingin menghapus agenda ini?')">
+                                    Hapus
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
         </div>
     </div>
 
@@ -152,7 +161,7 @@
 
     function openEditModal(agenda) {
     // Mengisi form edit dengan data agenda
-    document.getElementById('editForm').action = '/agenda/' + agenda.id; // Pastikan ini sesuai dengan rute yang terdaftar
+    document.getElementById('editForm').action = '{{ route("agenda.update", "") }}' + '/' + agenda.id; // Pastikan ini sesuai dengan rute yang terdaftar
     document.getElementById('editKategoriID').value = agenda.KategoriID;
     document.getElementById('editJudul').value = agenda.judul;
     document.getElementById('editIsi').value = agenda.isi;
